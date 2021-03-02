@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <script src="gauss.js"></script>
+        <script src="matrixInput.js"></script>
+    </head>
+
+    <body>
+        <h1>Gauss-Jordan Elimination  -- SOP Simon Lykke Andersen</h1>
+        <p>Her er hvor magien sker!</p>
+        <h3>TIL TIDSTAGNING!!!</h3>
+
+        <input id="fileIn" type="file" accept=".txt">
+        <input type="button" onclick="readFile();" value="LOAD FILE IN TEXT FIELD">
+        <pre id="outputFile"></pre>
+
+        <h3>INPUT</h3>
+        <p>Rows:</p>
+        <input id="numRows" type="number">
+        <p>Cols:</p>
+        <input id="numCols" type="number">
+        <input type="button" onclick="generateInputMatrix();" value="Update matrix">
+        <h3>Input matrix</h3>
+        <div id="tableDiv">
+            <table id="t">
+            </table>
+        </div>
+
+        <input type="button" onclick="solveInputMatrix();" value="Solve">
+        <h3>OUTPUT</h3>
+        <div id="output">
+        </div>
+    </body>
+</html>
