@@ -1,7 +1,7 @@
 // HANDLING HTML AND STUFF
 function generateInputMatrix(){
     let table = document.getElementById("t");
-    clearTable(table); //This deletes it so we have to reassign it
+    clearChildren(table); //This deletes it so we have to reassign it
 
     let numRows = document.getElementById("numRows").value;
     let numCols = document.getElementById("numCols").value;
@@ -14,7 +14,7 @@ function generateTable(table, rows, cols){
         let th = document.createElement("th");
         let text;
         if(colI < cols-1){
-            text = document.createTextNode("k"+(colI+1).toString());
+            text = document.createTextNode("x"+(colI+1).toString());
         }else{
             text = document.createTextNode("= ?");
         }
@@ -62,21 +62,22 @@ function outputSolved(m){
     //Clear output div
     clearChildren(outputDiv);
     //Output the new solution
-    solve(m);
+    GaussJordanElimination(m);
     console.log(m);
     let equations = solvedMatrixToEquations(m);
+
     equations.forEach(eq => {
-        let p = document.createElement("p");
-        let tEq = document.createTextNode(eq);
-        p.appendChild(tEq);
-        outputDiv.appendChild(p);
+        let newDiv = document.createElement("div");
+        outputDiv.appendChild(newDiv);
+        katex.render(eq, newDiv, {
+            throwOnError: false
+        });
     });
 }
 function solveInputMatrix(){
     let m = getInputMatrix();
     outputSolved(m);
 }
-
 function readFile(){
     let input = document.getElementById("fileIn");
     if(input.files.length > 0){
@@ -92,7 +93,6 @@ function readFile(){
         alert("No file was selected");
     }
 }
-
 function readMatricesAndTime(s){
     //Clear the outputFile field
     document.getElementById("outputFile").textContent = "";
@@ -116,7 +116,7 @@ function readMatricesAndTime(s){
         i += rows;
         //Time the solving
         let timeStart = window.performance.now();
-        solve(matrix);
+        GaussJordanElimination(matrix);
         let timeStop = window.performance.now();
         let deltaTime = timeStop-timeStart;
         newOutput += " "+deltaTime.toString()+"\n";
@@ -126,73 +126,78 @@ function readMatricesAndTime(s){
 
 
 }
-
-
 // HOW TO HANDLE THE RESULTING MATRIX
 function solvedMatrixToEquations(m){
-    let sol = [];
-    for(let rowI = 0; rowI < m.length; rowI++){
-        if(rowIsSolved(rowI, m)){
-            sol.push(completeRowToEquation(rowI, m));
-        }else{
-            sol.push(incompleteRowToEquation(rowI, m));
+    console.log(m);
+    let rM = rangM(m);
+    let rK = rangK(m);
+    let solutions = [];
+    //Ingen løsning
+    if(rK < rM){
+        solutions.push("INGEN \\ LOESNING");
+    //Én løsning
+    }else if(rM == rK && rM == m[0].length-1){
+        for(let i = 0; i < m.length; i++){
+            if(i < m[0].length-1){
+                solutions.push(completeRowToEquation(i, m));
+            }
+        }
+    //Uendeligt mange løsninger
+    }else if(rM == rK && rK < m.length){
+        for(let i = 0; i < m[0].length-1; i++){
+            if(i < m[0].length-1){
+                solutions.push(incompleteRowToEquation(i, m));
+            }
         }
     }
-    return sol;
+    return solutions;
 }
 function completeRowToEquation(rowI, m){
-    return "x"+(rowI+1).toString()+" = "+(m[rowI][m[0].length-1]).toString();
+    return "x_"+(rowI+1).toString()+" = "+(m[rowI][m[0].length-1]).toString();
 }
 //ADD SPECIAL CASE FOR WHEN ALL OF THE COEFFICIENTS ARE 0
 function incompleteRowToEquation(rowI, m){
     let eq;
     if(m[rowI][rowI] == 1){
-        eq = "x"+(rowI+1).toString()+" = "+(m[rowI][m[0].length-1]).toString();
+        eq = "x_"+(rowI+1).toString()+" = "+(m[rowI][m[0].length-1]).toString();
         for(let colI = 0; colI < m[rowI].length-1; colI++){
             if(colI == rowI){
             }else if(m[rowI][colI] != 0){
                 if(m[rowI][colI] > 0){
-                    eq += " - ("+m[rowI][colI].toString()+" * x"+(colI+1).toString()+")";
+                    eq += " - ("+m[rowI][colI].toString()+" \\cdot x_"+(colI+1).toString()+")";
                 }else{
-                    eq += " + ("+Math.abs(m[rowI][colI]).toString()+" * x"+(colI+1).toString()+")";
+                    eq += " + ("+Math.abs(m[rowI][colI]).toString()+" \\cdot x_"+(colI+1).toString()+")";
                 }
             }
         }
     //Just a shitty row, where the m[rowI][rowI] != 1, and then the equation is just given as the non-zero coefficients times their respective variables equal whatever is on the right side of the equal sign.
     //I AM NOT SURE IF THIS WILL EVERY BE RELEVANT? MAYBE IT WAS ONLY THE LAST ELSE I NEEDED TO ADD? HMMM ILL HAVE TO DETERMINE THAT LATER :)
-    }else if(rowIsValid(rowI, m)){
-        eq = "";
-        for(let colI = 0; colI < m[rowI].length-1; colI++){
-            if(m[rowI][colI] != 0){
-                if(eq.length > 1){
-                    eq += " + ";
-                }
-                eq += "("+m[rowI][colI].toString()+" * x"+(colI+1).toString()+")";
-            }
-        }
-        eq += " = "+m[rowI][m[rowI].length-1].toString();
-    }else{
-        eq = "x"+(rowI+1).toString()+" = undeterminable";
     }
     return eq;
 }
-function rowIsValid(rowI, m){ //Are the coefficient anything byt zero?
-    for(let colI = 0; colI < m[rowI].length-1; colI++){
-        if(m[rowI][colI] != 0){
-            return true;
+function rangM(m){
+    let r = 0;
+    for(let i = 0; i < m.length; i++){
+        //let nonZeroInRow = false;
+        for(let j = 0; j < m[0].length; j++){
+            if(m[i][j] != 0){
+                r += 1;
+                break;
+            }
         }
     }
-    return false;
+    return r;
 }
-function rowIsSolved(rowI, m){
-    for(let colI = 0; colI < m[rowI].length-1; colI++){
-        if(colI != rowI && m[rowI][colI] == 0){
-            //pass
-        }else if(colI == rowI && m[rowI][colI] == 1){
-            //pass
-        }else{
-            return false;
+function rangK(m){
+    let r = 0;
+    for(let i = 0; i < m.length; i++){
+        //let nonZeroInRow = false;
+        for(let j = 0; j < m[0].length-1; j++){
+            if(m[i][j] != 0){
+                r += 1;
+                break;
+            }
         }
     }
-    return true;
+    return r;
 }
