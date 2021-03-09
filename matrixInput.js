@@ -58,17 +58,35 @@ function getInputMatrix(){
     return mat;
 }
 function outputSolved(m){
-    let  outputDiv = document.getElementById("output");
-    //Clear output div
-    clearChildren(outputDiv);
     //Output the new solution
     GaussJordanElimination(m);
     console.log(m);
+    //Outputting the solved matrix
+    let outputMatrix = document.getElementById("outputMatrix");
+    //Clear output div
+    clearChildren(outputMatrix);
+    let matrixString = "\\begin{bmatrix} ";
+    m.forEach(row=>{
+        row.forEach(n=>{
+            matrixString += n.toString()+" & "
+        });
+        matrixString = matrixString.slice(0, -2);
+        matrixString += "\\\\";
+    });
+    matrixString = matrixString.slice(0, -2);
+    matrixString += "\\end{bmatrix}";
+    katex.render(matrixString, outputMatrix, {
+            throwOnError: false
+    });
+    //Output the solved matrix in equation form
+    let outputEquations = document.getElementById("outputEquations");
+    //Clear output div
+    clearChildren(outputEquations);
     let equations = solvedMatrixToEquations(m);
 
     equations.forEach(eq => {
         let newDiv = document.createElement("div");
-        outputDiv.appendChild(newDiv);
+        outputEquations.appendChild(newDiv);
         katex.render(eq, newDiv, {
             throwOnError: false
         });
@@ -155,7 +173,6 @@ function solvedMatrixToEquations(m){
 function completeRowToEquation(rowI, m){
     return "x_"+(rowI+1).toString()+" = "+(m[rowI][m[0].length-1]).toString();
 }
-//ADD SPECIAL CASE FOR WHEN ALL OF THE COEFFICIENTS ARE 0
 function incompleteRowToEquation(rowI, m){
     let eq;
     if(m[rowI][rowI] == 1){

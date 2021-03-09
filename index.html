@@ -24,7 +24,7 @@
         <input type="button" onclick="readFile();" value="LOAD FILE IN TEXT FIELD">
         <pre id="outputFile"></pre>
 
-        <h3>INPUT</h3>
+        <h2>INPUT</h2>
         <p>Rows:</p>
         <input id="numRows" type="number">
         <p>Cols:</p>
@@ -37,8 +37,12 @@
         </div>
 
         <input type="button" onclick="solveInputMatrix();" value="Solve">
-        <h3>OUTPUT</h3>
+        <h2>OUTPUT</h2>
         <div id="output">
+            <h3>Den fuldstændigt reducerede matrix:</h3>
+            <div id="outputMatrix"></div>
+            <h3>Løsningen på ligningsform:</h3>
+            <div id="outputEquations"></div>
         </div>
     </body>
 </html>
