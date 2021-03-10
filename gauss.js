@@ -35,7 +35,7 @@ function ro3(i, j, k, m){
 function GaussJordanElimination(m){
   //For hvert række-index
   //1.
-  for(let i = 0; i < m[0].length-1; i++){
+  for(let i = 0; i < m[0].length-1 && i < m.length; i++){
     //Hvis koefficient i (rI, rI) er nul
     //2.
     if(m[i][i] == 0){
