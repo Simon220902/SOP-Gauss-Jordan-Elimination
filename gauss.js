@@ -2,14 +2,6 @@ let mat = [[ 0, -1,  1,  2],
        [ 2,  4, -2,  2],
        [ 3,  4,  1,  9]]
 
-
-/*
-mat[i][j]
-let mat = [[ 1,  2,  3,  4],
-       [ 5,  6,  7,  8],
-       [ 9, 10, 11, 12]]
-*/
-
 //Ligning i række i ombyttes med række j
 function ro1(i, j, m){
   let rowI = m[i];
